@@ -1,0 +1,73 @@
+Added/Modfied user programs:
+	1)Added pstree
+		-prints process tree.
+		-Uses additional syscall function called sys_getprocs()
+	2)Modfied hello.c
+		-Changed to act as a test for pstree.
+		-Forks a couple children.
+		-Each calls pstree.
+                -This displays an "animated" example of pstree in action.
+        3)Added ps
+                -Prints the name, pid, state, and priority of all processes.
+                -Can call ps with an argument to set the priority of the process running ps.
+                   -$ps 40 runs ps and sets it's processes priority to 40.
+                -Created to test setpriority system call.
+                -Uses 2 new system calls.
+                   -cps for printing all proccess info.
+                   -setpriority for changing priority of the ps call.
+	4)Added ptest
+		-Test program for the priority scheduler code.
+		-Completes 2 test.
+			-Test 1 forks 2 processes that compete for cpu
+			 time with different priority levels. A third
+			 process is forked and calls ps to display
+			 which process has control of the cpu. If
+			 correct, it will be the one with the highest
+			 priority.
+			-Test 2 does the same as test 1 but the
+			 children are given priority levels outside
+			 of the allowed range of 0-200 inclusive. If
+			 correct, ps should show that xv6 corrects this
+			 bad input and keeps the priority level within
+			 the correct range, even with aging.
+	5)Added prioritytest
+		-Test program for priority scheduler behavior.
+		-Forks a few children.
+		-Gives children and parent different priorities.
+		-Both the children and parent perform the same task.
+		-Shows that higher priority processes finish first.
+
+Kernal updates:
+        v2 update
+        ----------------------------------------------
+        Declared getprocs(int, struct proc*) in user.h
+        Defined syscall getprocs in usys.S
+	Declared new syscall sys_getprocs in syscall.h
+ 		-Function definition in sysprocs.c
+	Added getprocs function to proc.c
+		-Declared in defs.h
+	Added uproc struct
+		-uproc.h
+		-For use with pstree.
+
+        v3 update
+        ----------------------------------------------
+        Declared setpriority(int) in user.h
+        Declared cps(void) in user.h
+        Defined syscall setpriority in usys.S
+        Defined syscall cps in usys.S
+        Declared new syscall sys_setpriority in syscall.h
+        	-Function definition in sysprocs.c
+			-Bounded between 0-200 inclusive.
+        Declared new syscall sys_cps in syscall.h
+        	-Function definition in sysprocs.c
+	Added cps() function to proc.c
+		-Iterates table and prints process info.
+	Updated Scheduler to priority based scheduler.
+		-Changes process based on priority.
+	Added priority data member to proc struct.
+		-In proc.h
+        Added aging to a processes wakes up.
+        	- priority = priority - 2
+        Added aging to a process that's used it's cpu time. 
+		- Priority = priority + 2
